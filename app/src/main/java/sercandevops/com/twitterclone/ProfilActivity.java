@@ -33,6 +33,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -70,7 +73,7 @@ public class ProfilActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(getApplicationContext());
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        id = preferences.getString("id","0");
+        id = preferences.getString("id","-1");
     }
 
     private void clickDurumu()
@@ -166,15 +169,10 @@ private void IzinDenetimi()
                 }
                 break;
         }
-
     }//click
-
-
     public void profilGuncellemeIstegiGonder()
     {
-        final ProgressDialog progressDialog = new ProgressDialog(ProfilActivity.this);
-        progressDialog.setTitle("Profil Güncelleniyor...");
-        progressDialog.show();
+        final ProgressDialog progressDialog = (ProgressDialog) ProgressDialog.show(ProfilActivity.this,"Profil Güncelleniyor...","Mesajar");
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_PROFIL_GUNCELLE, new Response.Listener<String>() {
             @Override
@@ -182,12 +180,37 @@ private void IzinDenetimi()
 
                 progressDialog.dismiss();
                 Log.e("Json verisi : " ,response);
+
+                String durum = null;
+                String mesaj = null;
+
+                try
+                {
+                    JSONObject jsonObject = new JSONObject(response);
+                    durum = jsonObject.getString("status");
+                    mesaj = jsonObject.getString("mesaj");
+                }catch (JSONException e)
+                {
+                    e.printStackTrace();
+                }
+
+                if(durum.equals("200"))
+                {
+                    Snackbar.make(constraintlayot,mesaj,Snackbar.LENGTH_LONG).show();
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putBoolean("ProfilChanged",true);
+                    editor.commit();
+                }else
+                {
+                    Snackbar.make(constraintlayot,mesaj,Snackbar.LENGTH_LONG).show();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
                 progressDialog.dismiss();
+                Log.e("HATA : ",error.getLocalizedMessage().toString());
             }
         }){
             @Override

@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"></uses-permission>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -15,31 +15,30 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".ProfilActivity" android:parentActivityName=".GirisEkrani">
-                <meta-data android:name="androi.support.PARENT_ACTIVITY"  android:value=".Twitter"></meta-data>
+        <activity android:name=".TweetGonder" android:parentActivityName=".Twitter">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value=".Twitter"></meta-data>
         </activity>
 
         <activity
-            android:name=".Twitter"
-            android:label="@string/title_activity_twitter"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".KayitEkrani"
-            android:parentActivityName=".GirisEkrani"
-            android:theme="@style/TamEkran">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".GirisEkrani" />
+            android:name=".ProfilActivity" android:parentActivityName=".GirisEkrani">
+            <meta-data android:name="androi.support.PARENT_ACTIVITY" android:value=".Twitter" />
         </activity>
+
         <activity
-            android:name=".GirisEkrani"
-            android:theme="@style/TamEkran">
+            android:name=".Twitter" android:label="@string/title_activity_twitter" android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity android:name=".KayitEkrani" android:parentActivityName=".GirisEkrani" android:theme="@style/TamEkran">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value=".GirisEkrani" />
+        </activity>
+
+        <activity android:name=".GirisEkrani" android:theme="@style/TamEkran">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

@@ -1,11 +1,15 @@
 package sercandevops.com.twitterclone;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.gesture.Prediction;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,15 +21,38 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONObject;
+import org.w3c.dom.Text;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class Twitter extends AppCompatActivity  implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final String URL_PROFIL_BILGILERI = "http://10.0.2.2/twitterclone/profilBilgileri.php";
     Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private int[] tabIcons={R.drawable.ic_home,R.drawable.ic_notifications,R.drawable.ic_mesaj};
+    RequestQueue requestQueue;
+    SharedPreferences sharedPreferences;
+
+    CircleImageView profile_image;
+    TextView eposta,adsoyad;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,15 +60,21 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
         setContentView(R.layout.activity_twitter);
 
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_tweeet_at_butonu);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                startActivity(new Intent(Twitter.this,TweetGonder.class));
             }
         });
 
@@ -64,10 +97,12 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
         //NAV HEADER ICERISINDEK NESNELERE BOYLE ULAŞTIRIYORSUNUZ..
         LinearLayout layout = (LinearLayout) navigationView.getHeaderView(0);
 
-        TextView adsoyad = layout.findViewById(R.id.tv_adsoyad_nav);
-        TextView eposta = layout.findViewById(R.id.tv_email_nav);
-        CircleImageView profile_image = layout.findViewById(R.id.img_profile_image);
+         adsoyad = layout.findViewById(R.id.tv_adsoyad_nav);
+         eposta = layout.findViewById(R.id.tv_email_nav);
+         profile_image = layout.findViewById(R.id.img_profile_image);
 
+
+        setProfilBilgileri(sharedPreferences.getString("id","-1"));
 
         tabLayout.addOnTabSelectedListener(new TabLayout.BaseOnTabSelectedListener() {
             @Override
@@ -85,7 +120,19 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
 
             }
         });
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(sharedPreferences.getBoolean("ProfilChanged",false))
+        {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("ProfilChanged",false);
+            editor.commit();
+            setProfilBilgileri(sharedPreferences.getString("id","-1"));
+        }
 
     }
 
@@ -104,6 +151,68 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
 
         viewPager.setAdapter(adapter);
     }
+
+
+
+    private void setProfilBilgileri(final String id)
+    {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_PROFIL_BILGILERI, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                Log.e("Json verisi : ",response);
+
+                String durum = "",mesaj="",adsoyad="",avatar="",mail="";
+
+                try{
+                    JSONObject jsonObject = new JSONObject(response);
+                    durum = jsonObject.getString("status");
+                    mesaj = jsonObject.getString("mesaj");
+                    adsoyad = jsonObject.getString("adsoyad");
+                    avatar = jsonObject.getString("avatar");
+                    mail = jsonObject.getString("mail");
+
+
+                }catch (Exception e)
+                {
+                    Log.e("JSON BILGILER HATA :",e.getLocalizedMessage());
+                }
+
+
+                if(durum.equals("200")) {
+                    setProfil(mail,adsoyad,avatar);
+                }else{
+                    Toast.makeText(getApplicationContext(),mesaj,Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("JSON BILGILER HATA 2 :",error.getLocalizedMessage());
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> degerler = new HashMap<>();
+                degerler.put("id",id);
+                return degerler;
+            }
+        };
+
+        requestQueue.add(stringRequest);
+    }//func
+
+    private void setProfil(String stadsoyad,String mail,String avatar)
+    {
+        eposta.setText(mail);
+        adsoyad.setText(stadsoyad);
+
+        Picasso.Builder builder = new Picasso.Builder(getApplicationContext());
+        Picasso pic = builder.build();
+        pic.load(avatar).into(profile_image);
+       // Picasso.get().load(avatar).resize(70, 70).centerCrop().into(profile_image);
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -116,23 +225,17 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.twitter, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -153,10 +256,17 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
 
         } else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_cikis) {
 
-        } else if (id == R.id.nav_send) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean("benihatirla",false);
+                editor.putString("id","-1");
+                editor.commit();
 
+            Intent intent = new Intent(Twitter.this,GirisEkrani.class);
+            startActivity(intent);
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
