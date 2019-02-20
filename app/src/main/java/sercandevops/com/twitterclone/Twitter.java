@@ -5,9 +5,13 @@ import android.content.SharedPreferences;
 import android.gesture.Prediction;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
@@ -35,7 +39,9 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -52,6 +58,8 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
 
     CircleImageView profile_image;
     TextView eposta,adsoyad;
+
+    String id;
 
 
     @Override
@@ -101,8 +109,9 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
          eposta = layout.findViewById(R.id.tv_email_nav);
          profile_image = layout.findViewById(R.id.img_profile_image);
 
+         id = sharedPreferences.getString("id","-1");
 
-        setProfilBilgileri(sharedPreferences.getString("id","-1"));
+        setProfilBilgileri(id);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.BaseOnTabSelectedListener() {
             @Override
@@ -273,4 +282,46 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    public class ViewPagerAdapter extends FragmentPagerAdapter {
+
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitlelist = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+
+            if (i == 0) {
+                Fragment fragment = mFragmentList.get(i);
+                Bundle bundle = new Bundle();
+                bundle.putString("id",id);
+                fragment.setArguments(bundle);
+                return fragment;
+            }
+            return mFragmentList.get(i);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitlelist.get(position);
+        }
+
+        public void addFlag(Fragment fragment, String title)
+        {
+            mFragmentList.add(fragment);
+            mFragmentTitlelist.add(title);
+        }
+
+
+    }//class
 }
