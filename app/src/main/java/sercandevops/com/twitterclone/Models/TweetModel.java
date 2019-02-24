@@ -1,13 +1,15 @@
 package sercandevops.com.twitterclone.Models;
 
+import android.widget.ImageView;
+
 public class TweetModel {
     private String adSoyadi,kullaniciAdi,profilPath,resimPath,tweetText;
-    private long tarih;
+    private String tarih;
 
     public TweetModel() {
     }
 
-    public TweetModel(String adSoyadi, String kullaniciAdi, String profilPath, String resimPath, String tweetText, long tarih) {
+    public TweetModel(String adSoyadi, String kullaniciAdi, String profilPath, String resimPath, String tweetText, String tarih) {
         this.adSoyadi = adSoyadi;
         this.kullaniciAdi = kullaniciAdi;
         this.profilPath = profilPath;
@@ -57,11 +59,11 @@ public class TweetModel {
         this.tweetText = tweetText;
     }
 
-    public long getTarih() {
+    public String getTarih() {
         return tarih;
     }
 
-    public void setTarih(long tarih) {
+    public void setTarih(String tarih) {
         this.tarih = tarih;
     }
 }

@@ -33,4 +33,5 @@ dependencies {
     implementation 'eu.the4thfloor.volley:com.android.volley:2015.05.28'
     implementation 'de.hdodenhof:circleimageview:3.0.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }

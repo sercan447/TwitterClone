@@ -7,6 +7,7 @@
     tools:context=".TweetGonder">
 
     <EditText
+        android:background="@drawable/post_bg"
         android:id="@+id/edit_twwetat"
         android:layout_width="0dp"
         android:layout_height="0dp"

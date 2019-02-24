@@ -5,7 +5,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:paddingBottom="7dp"
-    android:layout_height="match_parent"
+    android:padding="15dp"
+    android:layout_height="wrap_content"
     android:background="@color/cardview_light_background">
 
 
@@ -14,6 +15,7 @@
         android:layout_height="wrap_content"
         app:cardCornerRadius="4dp"
         app:cardElevation="7dp"
+        android:layout_marginBottom="5dp"
         app:contentPadding="7dp">
 
 
@@ -65,7 +67,7 @@
                         tools:layout_editor_absoluteY="0dp" />
 
                     <TextView
-                        android:id="@+id/tv_dakika"
+                        android:id="@+id/tv_tarih"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="96dp"
@@ -79,6 +81,7 @@
                 </android.support.constraint.ConstraintLayout>
 
                 <TextView
+                    android:id="@+id/tv_tweet"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Öncelikle while dongusunun bahset"

@@ -153,7 +153,7 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
     }
     private void setupViewPager(ViewPager viewPager)
     {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        ViewPagerAdapter1 adapter = new ViewPagerAdapter1(getSupportFragmentManager());
         adapter.addFlag(new Anasayfa(),"Anasayfa");
         adapter.addFlag(new Bildirimler(),"Bildirimler");
         adapter.addFlag(new Mesajlar(),"Mesajlar");
@@ -283,12 +283,12 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
         return true;
     }
 
-    public class ViewPagerAdapter extends FragmentPagerAdapter {
+    public class ViewPagerAdapter1 extends FragmentPagerAdapter {
 
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitlelist = new ArrayList<>();
 
-        public ViewPagerAdapter(FragmentManager fm) {
+        public ViewPagerAdapter1(FragmentManager fm) {
             super(fm);
         }
 
