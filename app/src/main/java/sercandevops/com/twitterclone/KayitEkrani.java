@@ -57,6 +57,7 @@ public class KayitEkrani extends AppCompatActivity {
     private static final String URL_KAYIT = "http://10.0.2.2/twitterclone/register.php";
     private SharedPreferences preferences;
 
+    ObjectAnimator animator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -256,7 +257,7 @@ public class KayitEkrani extends AppCompatActivity {
         imageKayit.getLayoutParams().width = (int) (yukseklik * 1.78);
         imageKayit.getLayoutParams().height = yukseklik;
 
-        ObjectAnimator animator =  ObjectAnimator.ofFloat(imageKayit,"x",0,-(yukseklik*1.78f - genislik),0,
+         animator =  ObjectAnimator.ofFloat(imageKayit,"x",0,-(yukseklik*1.78f - genislik),0,
                 -(yukseklik*1.78f - genislik));
         animator.setDuration(210000);
         animator.setInterpolator(new LinearInterpolator());
@@ -275,4 +276,28 @@ public class KayitEkrani extends AppCompatActivity {
             return false;
         }
     }//FUNC
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if(animator != null)
+            animator.pause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(animator.isPaused())
+            animator.resume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if(animator != null)
+            animator.cancel();
+    }
 }

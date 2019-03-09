@@ -3,21 +3,32 @@ package sercandevops.com.twitterclone.Models;
 import android.widget.ImageView;
 
 public class TweetModel {
+
+    private int Id;
     private String adSoyadi,kullaniciAdi,profilPath,resimPath,tweetText;
     private String tarih;
+    private String uuid;
+    private String mail;
 
     public TweetModel() {
     }
 
-    public TweetModel(String adSoyadi, String kullaniciAdi, String profilPath, String resimPath, String tweetText, String tarih) {
-        this.adSoyadi = adSoyadi;
-        this.kullaniciAdi = kullaniciAdi;
-        this.profilPath = profilPath;
-        this.resimPath = resimPath;
-        this.tweetText = tweetText;
-        this.tarih = tarih;
+
+    public int getId() {
+        return Id;
     }
 
+    public void setId(int id) {
+        Id = id;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
 
     public String getAdSoyadi() {
         return adSoyadi;
@@ -65,5 +76,13 @@ public class TweetModel {
 
     public void setTarih(String tarih) {
         this.tarih = tarih;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }

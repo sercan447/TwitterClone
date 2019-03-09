@@ -71,19 +71,27 @@ public class GirisEkrani extends AppCompatActivity {
 
         ArkaPlanDurumKontrolu();
 
-        findViewById(R.id.tv_sifremiunuttum).setOnTouchListener(new View.OnTouchListener() {
+      /*  findViewById(R.id.tv_sifremiunuttum).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
                 if(event.getAction() == MotionEvent.ACTION_DOWN)
-                    ((TextView)v).setTextColor(Color.parseColor("#dd999999"));
+                    ((TextView)v).setTextColor(Color.parseColor("#dd99999"));
                 if(event.getAction() == MotionEvent.ACTION_UP)
                     ((TextView)v).setTextColor(Color.WHITE);
 
-                return false;
+                    return false;
             }
         });
+        */
 
+      TextView tvSifremiunuttum = findViewById(R.id.tv_sifremiunuttum);
+        tvSifremiunuttum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(GirisEkrani.this,SifremiUnuttumActivity.class));
+            }
+        });
 
     }
     public void initialize()
@@ -101,6 +109,7 @@ public class GirisEkrani extends AppCompatActivity {
         if(sharedPreferences.getBoolean("benihatirla",false))
         {
             Intent intent = new Intent(GirisEkrani.this,Twitter.class);
+            intent.putExtra("animasyon",true);
             startActivity(intent);
             finish();
         }
@@ -170,9 +179,11 @@ public class GirisEkrani extends AppCompatActivity {
                             SharedPreferences.Editor editor = sharedPreferences.edit();
                             editor.putString("id",jsonObject.getString("id"));
                             editor.putBoolean("benihatira",chk_hatirla.isChecked());
+
                             editor.commit();
                       //  }
                         Intent intent = new Intent(GirisEkrani.this,Twitter.class);
+                        intent.putExtra("animasyon",true);
                         startActivity(intent);
                         finish();
 

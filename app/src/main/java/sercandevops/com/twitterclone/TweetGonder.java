@@ -83,7 +83,10 @@ public class TweetGonder extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                int i = 280 - start;
+
+                int i = 280 - s.toString().trim().length();
+
+
                 sayac.setText(String.valueOf(i));
 
                 if(i < 0){

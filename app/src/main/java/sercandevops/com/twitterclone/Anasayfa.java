@@ -141,6 +141,8 @@ public class Anasayfa extends Fragment {
                             model.setResimPath(tweet.getString("path1"));
                             model.setTweetText(tweet.getString("text1"));
                             model.setTarih(tweet.getString("date"));
+                            model.setUuid(tweet.getString("uuid"));
+
 
                         } catch (JSONException e) {
                             Log.e("json parse hatası :", e.getLocalizedMessage());
@@ -180,7 +182,7 @@ public class Anasayfa extends Fragment {
 
     private void setAdapter() {
 
-        mAdapter = new MyAdapter(modelList,getContext());
+        mAdapter = new MyAdapter(modelList,getActivity(),true);
         recyclerView.setAdapter(mAdapter);
     }//func
 

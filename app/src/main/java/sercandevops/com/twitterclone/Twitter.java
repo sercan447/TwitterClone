@@ -1,5 +1,8 @@
 package sercandevops.com.twitterclone;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.gesture.Prediction;
@@ -13,7 +16,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -23,6 +28,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +45,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
@@ -45,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import sercandevops.com.twitterclone.Models.TweetModel;
 
 public class Twitter extends AppCompatActivity  implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -55,6 +69,8 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
     private int[] tabIcons={R.drawable.ic_home,R.drawable.ic_notifications,R.drawable.ic_mesaj};
     RequestQueue requestQueue;
     SharedPreferences sharedPreferences;
+
+    SwitchCompat switch_gecemodu;
 
     CircleImageView profile_image;
     TextView eposta,adsoyad;
@@ -68,8 +84,61 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
         setContentView(R.layout.activity_twitter);
 
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        switch_gecemodu = findViewById(R.id.switch_gecemodu);
 
+
+
+        boolean girisEkraninaGeldim = getIntent().getBooleanExtra("animasyon",false);
+        if(girisEkraninaGeldim)
+        {
+            //GIRIS EKRANI OLUŞTURUYORUZ ANIMASYONLU
+            final LinearLayout view = new LinearLayout(Twitter.this);
+            ImageView icon = new ImageView(Twitter.this);
+            view.setGravity(Gravity.CENTER);
+            view.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            icon.setImageResource(R.drawable.acilis_iconu);
+
+            view.addView(icon,250,250);
+            getWindow().addContentView(view,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+
+            Animation scaleAnim = AnimationUtils.loadAnimation(Twitter.this,R.anim.giris_animasyonu);
+            icon.clearAnimation();
+            icon.startAnimation(scaleAnim);
+
+            scaleAnim.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    ObjectAnimator animator = ObjectAnimator.ofFloat(view,"alpha",1.0f,0.0f);
+                    animation.setDuration(300);
+                    animation.setInterpolator(new LinearInterpolator());
+                    animator.start();
+                    animator.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+
+                            // anımsayon bıttıkten sonra gorunurluk ozellıgını ,GORUNMEZ hale getırmeliyiz.
+                            view.setVisibility(View.GONE);
+
+                        }
+                    });
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+        }
+        // ANIMASYON ISLEMLERI BURADA BITIYOR..
+
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -217,9 +286,20 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
         eposta.setText(mail);
         adsoyad.setText(stadsoyad);
 
-        Picasso.Builder builder = new Picasso.Builder(getApplicationContext());
-        Picasso pic = builder.build();
-        pic.load(avatar).into(profile_image);
+        if(!avatar.equals(""))
+        {
+            //picasso resimleri hafızaya alıyor
+            //o yüzden hemen güncellleme yapmada problem yaayabiliyor
+            //o yüzden aşağıdaki işlemin yapılması en saglıklı durum oluyor.
+            Picasso.get().load(avatar).memoryPolicy(MemoryPolicy.NO_CACHE)
+                                        .networkPolicy(NetworkPolicy.NO_CACHE)
+                                        .resize(70,70)
+                                        .centerCrop()
+                                        .into(profile_image);
+        }
+        //Picasso.Builder builder = new Picasso.Builder(getApplicationContext());
+       // Picasso pic = builder.build();
+      //  pic.load(avatar).into(profile_image);
        // Picasso.get().load(avatar).resize(70, 70).centerCrop().into(profile_image);
     }
     @Override
@@ -245,6 +325,12 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
         if (id == R.id.action_settings) {
             return true;
         }
+
+        if(id == R.id.tweetkisi_arama)
+        {
+            startActivity(new Intent(Twitter.this,AramaActivity.class));
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -265,6 +351,35 @@ public class Twitter extends AppCompatActivity  implements NavigationView.OnNavi
 
         } else if (id == R.id.nav_manage) {
 
+        }else if(id == R.id.nav_gecemodu)
+        {
+           Log.e("ALEM","ttt");
+           /* switch_gecemodu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (switch_gecemodu.isChecked())
+                    {
+                        Toast.makeText(Twitter.this,"gece modu",Toast.LENGTH_SHORT).show();
+                    }else
+                    {
+                        Toast.makeText(Twitter.this,"gece modu",Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+            });
+            */
+            switch_gecemodu.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked)
+                    {
+                        Toast.makeText(getApplicationContext(),"gece modu",Toast.LENGTH_SHORT).show();
+                    }else
+                    {
+                        Toast.makeText(getApplicationContext(),"gece modu",Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         } else if (id == R.id.nav_cikis) {
 
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
